@@ -1,21 +1,22 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart'; // Importa la biblioteca Cupertino de Flutter para usar widgets específicos de iOS
+import 'package:flutter/material.dart'; // Importa la biblioteca Material de Flutter para usar widgets y herramientas de Material Design
 
-abstract class Dialogs {
+abstract class Dialogs { // Define una clase abstracta llamada Dialogs
 
+  // Método estático para mostrar un diálogo de alerta
   static alert(
-      BuildContext context, 
+      BuildContext context,
       {required String title,
-       required String description}) {
-    showDialog(context: context, builder: (_) => AlertDialog(
-      title: Text(title),
-      content: Text(description),
-      actions: [
-        ElevatedButton(
+      required String description}) {
+    showDialog(context: context, builder: (_) => AlertDialog( // Muestra un AlertDialog
+      title: Text(title), // Establece el título del AlertDialog
+      content: Text(description), // Establece el contenido del AlertDialog
+      actions: [ // Lista de acciones en el AlertDialog
+        ElevatedButton( // Botón de acción
             onPressed: (){
-              Navigator.pop(_);
+              Navigator.pop(_); // Cierra el diálogo.
             },
-            child: Text('OK')
+            child: Text('OK') // Texto del botón de acción.
         )
       ],
     ));
@@ -23,27 +24,28 @@ abstract class Dialogs {
 
 }
 
-abstract class ProgressDialog {
+abstract class ProgressDialog { // Define una clase abstracta llamada ProgressDialog.
 
+  // Método estático para mostrar un diálogo de progreso.
   static show(BuildContext context) {
-    showCupertinoModalPopup(
+    showCupertinoModalPopup( // Muestra un diálogo modal en estilo Cupertino (iOS)
         context: context,
         builder: (_) {
-          return PopScope(
-            canPop: false,
-            onPopInvoked: (didPop) {
+          return PopScope( // Widget PopScope para controlar el comportamiento de navegación
+            canPop: false, // No se permite que el usuario cierre el diálogo al hacer pop
+            onPopInvoked: (didPop) { // Función que se ejecuta cuando se intenta cerrar el diálogo
               if (didPop) {
-                // Aqui va ir al final
+                // Aquí iría la lógica cuando se intenta cerrar el diálogo
                 return;
               }
-              // Aqui va ir cuando se intente ir para atras
+              // Aquí iría la lógica cuando se intenta ir hacia atrás
             },
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.white.withOpacity(0.9),
-              child: const Center(
-                child: CircularProgressIndicator(),
+            child: Container( // Contenedor que contiene el indicador de progreso
+              width: double.infinity, // Ancho del contenedor igual al ancho de la pantalla
+              height: double.infinity, // Altura del contenedor igual a la altura de la pantalla
+              color: Colors.white.withOpacity(0.9), // Color de fondo del contenedor con opacidad
+              child: const Center( // Centro el indicador de progreso en el contenedor
+                child: CircularProgressIndicator(), // Indicador de progreso circular
               ),
             ),
           );
@@ -51,8 +53,8 @@ abstract class ProgressDialog {
     );
   }
 
+  // Método estático para cerrar el diálogo de progreso
   static dismiss(BuildContext context) {
-    Navigator.pop(context);
+    Navigator.pop(context); // Cierra el diálogo de progreso
   }
-
 }

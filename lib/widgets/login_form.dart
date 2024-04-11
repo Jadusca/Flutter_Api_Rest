@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_api_rest/api/authentication_api.dart';
-import 'package:flutter_api_rest/data/authentication_cliente.dart';
+import 'package:flutter_api_rest/data/authentication_client.dart';
 import 'package:flutter_api_rest/models/user_credential_model.dart';
 import 'package:flutter_api_rest/pages/home_page.dart';
 import 'package:flutter_api_rest/utils/dialogs.dart';
@@ -18,40 +18,40 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  final GlobalKey<FormState> _formKey = GlobalKey();
-  final _authenticationApi = GetIt.instance<AuthenticationApi>();
-  final _authenticationClient = GetIt.instance<AuthenticationClient>();
-  String _email = '', _password = '';
+  final GlobalKey<FormState> _formKey = GlobalKey(); // Clave global para identificar el formulario
+  final _authenticationApi = GetIt.instance<AuthenticationApi>(); // Instancia de la API de autenticacion
+  final _authenticationClient = GetIt.instance<AuthenticationClient>(); //Instancia del cliente de autenticación
+  String _email = '', _password = ''; //Variables para almacenar la entrada de datos
 
   Future<void> _submit() async {
-    final bool isOk = _formKey.currentState!.validate();
+    final bool isOk = _formKey.currentState!.validate(); // Valida el formulario
     if (isOk) {
-      ProgressDialog.show(context);
+      ProgressDialog.show(context); // Muestra un diálogo de progreso
 
-      final response = await _authenticationApi.login(
+      final response = await _authenticationApi.login( // Eniva una solicitud de inicio de sesión a la API
           userCredential:
               UserCredentialModel(email: _email, password: _password));
-      ProgressDialog.dismiss(context);
+      ProgressDialog.dismiss(context); // Cierra el diálogo de progreso
 
       if (response.data != null) {
-        await _authenticationClient.saveSession(response.data!);
+        await _authenticationClient.saveSession(response.data!); //Guarda la sesión del usuario
         Navigator.pushNamedAndRemoveUntil(
           context,
           HomePage.routeName,
           (_) => false,
-        );
+        ); // Navega a la pagina de inicio y elimina las rutas anteriores
       } else {
-        String message = response.error!.message;
+        String message = response.error!.message; // Mensaje de error prederteminado
 
         if (response.error!.statusCode == -1) {
-          message = 'Bad Network';
+          message = 'Bad Network'; // Mensaje de error para problemas de red
         } else if (response.error!.statusCode == 403) {
-          message = 'Invalid password';
+          message = 'Invalid password'; // Mensaje de error para contraseña invalida
         } else if (response.error!.statusCode == 404) {
-          message = 'User not found';
+          message = 'User not found'; // Mensaje de error para usuario no encontrado
         }
 
-        Dialogs.alert(context, title: 'Error', description: message);
+        Dialogs.alert(context, title: 'Error', description: message); //Muestra un diaologo de error con el mensaje correspondiente
       }
     }
   }
@@ -59,16 +59,16 @@ class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
 
-    final Responsive responsive = Responsive.of(context);
+    final Responsive responsive = Responsive.of(context); // Este hace que se obtenga un objeto responsivo para manejar el diseño adaptativo
 
     return Positioned(
-      bottom: 30,
+      bottom: 30, // Posiciona el widget en la parte inferior de la pantalla
       child: Container(
         constraints: BoxConstraints(
-              maxWidth: responsive.isTablet ? 430 : 360,
+              maxWidth: responsive.isTablet ? 430 : 360, // Limita el ancho máximo del contenedor según el tamaño del dispositivo
             ),
         child: Form(
-          key: _formKey,
+          key: _formKey, // Asigna la clave global al formulario
           child: Column(
           children: <Widget>[
             InputText(
@@ -76,16 +76,16 @@ class _LoginFormState extends State<LoginForm> {
               label: "EMAIL ADDRESS",
               fontSize: responsive.dp(responsive.isTablet ? 1.2 :1.4),
               onChanged: (text){
-                _email = text;
+                _email = text; // Captura el texto ingresado para la dirección de correo electrónico
               },
               validator: (text){
                 if(!text!.contains('@')){
-                  return "Invalid email";
+                  return "Invalid email"; // Valida la entrada del correo electrónico.
                 }
                 return null;
               },
             ),
-            SizedBox(height: responsive.dp(2)),
+            SizedBox(height: responsive.dp(2)), // Deja espacion en blanco en forma vertical
             Container(
               decoration: const BoxDecoration(
                 border: Border(
@@ -103,18 +103,18 @@ class _LoginFormState extends State<LoginForm> {
                       borderEnabled: false,
                       fontSize: responsive.dp(responsive.isTablet ? 1.2 : 1.4),
                       onChanged: (text){
-                        _password = text;
+                        _password = text; // Captura el texto ingresado para la contraseña
                       },
                       validator: (text){
                         if(text?.trim().isEmpty == true){
-                          return "Invalid password";
+                          return "Invalid password"; // Valida la entrada de la contraseña.
                         }
                         return null;
                       },
                     ),
                   ),
                   //Ya quedo obsoleto el flatButton, pero hace la misma función
-                  TextButton(
+                  TextButton( // Boton de texto para olvidar la contraseña
                     onPressed: () {}, // Sin realizar ninguna acción
                     child: const Text(
                       "Forgot Password",
@@ -126,14 +126,14 @@ class _LoginFormState extends State<LoginForm> {
                 ],
               ),
             ),
-            SizedBox(height: responsive.dp(4)),
+            SizedBox(height: responsive.dp(4)), // Deja espacion en blanco en forma vertical
             SizedBox(
-              width: double.infinity,
+              width: double.infinity, // El botón ocupa todo el ancho disponible
               child: MaterialButton(
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 color: Colors.pinkAccent,
                 onPressed: (){
-                  _submit();
+                  _submit(); // Maneja la acción de eneviar el formulario
                 },
                 child: const Text(
                   "Sign in",
@@ -143,7 +143,7 @@ class _LoginFormState extends State<LoginForm> {
                 ),
               ),
             ),
-            SizedBox(height: responsive.dp(2)),
+            SizedBox(height: responsive.dp(2)), // Deja espacion en blanco en forma vertical
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -157,12 +157,12 @@ class _LoginFormState extends State<LoginForm> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, 'register');
+                  Navigator.pushNamed(context, 'register'); //Navega a la pagina de registro
                 },
                 ),
               ],
             ),
-            SizedBox(height: responsive.dp(10)),
+            SizedBox(height: responsive.dp(10)), // Deja espacion en blanco en forma vertical
           ],
                 ),
         ),

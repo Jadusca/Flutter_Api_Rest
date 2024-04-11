@@ -1,5 +1,5 @@
+//Importaciones necesarias para el proyecto flutter
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_api_rest/api/authentication_api.dart';
 import 'package:flutter_api_rest/models/user_register_model.dart';
@@ -10,7 +10,7 @@ import 'package:flutter_api_rest/utils/responsive.dart';
 import 'package:flutter_api_rest/widgets/input_text.dart';
 import 'package:get_it/get_it.dart';
 
-class RegisterForm extends StatefulWidget {
+class RegisterForm extends StatefulWidget { //Widget de estado mutable
   const RegisterForm({super.key});
 
   @override
@@ -19,39 +19,39 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<RegisterForm> {
 
-  final GlobalKey<FormState> _formKey = GlobalKey();
-  String _email = '', _password = '', _username = '';
-  final _authenticationApi = GetIt.instance<AuthenticationApi>();
-  final _authenticationClient = GetIt.instance<AuthenticationClient>();
+  final GlobalKey<FormState> _formKey = GlobalKey(); //para acceder a widgets específicos desde cualquier parte de la aplicación
+  String _email = '', _password = '', _username = ''; //variables para almacenar datos de entrada
+  final _authenticationApi = GetIt.instance<AuthenticationApi>(); //Instancia de la API de autenticación
+  final _authenticationClient = GetIt.instance<AuthenticationClient>(); //Instancia del cliente de autenticación
 
-  Future<void>_submit() async {
-    final bool isOk = _formKey.currentState!.validate();
+  Future<void>_submit() async {//Este metodo se llama cuando el usuario envia el formulario, valida los campos
+    final bool isOk = _formKey.currentState!.validate(); //Valida el formulario
     if (isOk) {
-      ProgressDialog.show(context);
-      final response = await _authenticationApi.register(
+      ProgressDialog.show(context); //muestra un dialogo de progreso
+      final response = await _authenticationApi.register( //Le envia una solicitud de registro a la API
           userRegister: UserRegisterModel(
               username: _username,
               email: _email,
               password: _password
           ),
       );
-      ProgressDialog.dismiss(context);
+      ProgressDialog.dismiss(context); //Cierra el dialogo de progreso
       if (response.data != null) {
-        await _authenticationClient.saveSession(response.data!);
-        Navigator.pushNamedAndRemoveUntil(context, HomePage.routeName, (_) => false);
+        await _authenticationClient.saveSession(response.data!); //Guarda la sesion del usuario
+        Navigator.pushNamedAndRemoveUntil(context, HomePage.routeName, (_) => false); //Navega a la pagina de inicio y elimina rutas anteriores
       }
       else {
 
-        String message = response.error!.message;
+        String message = response.error!.message; //Mensaje de error
 
-        if (response.error!.statusCode == -1) {
+        if (response.error!.statusCode == -1) { //Mensaje de error a problemas de red
           message = 'Bad Network';
         }
         else if (response.error!.statusCode == 409) {
-          message = 'Duplicate user ${jsonEncode(response.error!.data['duplicatedFields'])}';
+          message = 'Duplicate user ${jsonEncode(response.error!.data['duplicatedFields'])}'; //Mensaje de error para usuario duplicado
         }
 
-        Dialogs.alert(
+        Dialogs.alert( //Muestra un mensaje de error adecuado (bad network o usuario duplicado)
             context,
             title: 'Error',
             description: message
@@ -63,16 +63,16 @@ class _RegisterFormState extends State<RegisterForm> {
   @override
   Widget build(BuildContext context) {
 
-    final Responsive responsive = Responsive.of(context);
+    final Responsive responsive = Responsive.of(context); //Es para adaptar a cualquier ancho de pantalla
 
     return Positioned(
-      bottom: 30,
+      bottom: 30, //ósicioa el widget en la parte inferior de la pantalla
       child: Container(
         constraints: BoxConstraints(
-              maxWidth: responsive.isTablet ? 430 : 360,
+              maxWidth: responsive.isTablet ? 430 : 360, //Limita el ancho maximo del contenedor meidante el tamaño del dispositivo
             ),
-        child: Form(
-          key: _formKey,
+        child: Form( //
+          key: _formKey, // Asigna la clave globar al formulario
           child: Column(
           children: <Widget>[
             InputText(
@@ -80,26 +80,26 @@ class _RegisterFormState extends State<RegisterForm> {
               label: "USERNAME",
               fontSize: responsive.dp(responsive.isTablet ? 1.2 :1.4),
               onChanged: (text){
-                _username = text;
+                _username = text; // Captura el texto ingresado para el nombre de usuario
               },
               validator: (text){
                 if(text!.trim().length < 5){
-                  return "Invalid username";
+                  return "Invalid username"; //Valida la entrada del nombre de usuario
                 }
                 return null;
               },
             ),
-            SizedBox(height: responsive.dp(2)),
+            SizedBox(height: responsive.dp(2)), //Deja espacios en blanco
             InputText(
               keyboardType: TextInputType.emailAddress,
               label: "EMAIL ADDRESS",
               fontSize: responsive.dp(responsive.isTablet ? 1.2 :1.4),
               onChanged: (text){
-                _email = text;
+                _email = text; // Captura el texto ingresado para la direccion de correo electronico
               },
               validator: (text){
                 if(!text!.contains('@')){
-                  return "Invalid email";
+                  return "Invalid email"; //Valida la entrada del correo electronico
                 }
                 return null;
               },
@@ -110,23 +110,23 @@ class _RegisterFormState extends State<RegisterForm> {
               label: "PASSWORD",
               fontSize: responsive.dp(responsive.isTablet ? 1.2 :1.4),
               onChanged: (text){
-                _password = text;
+                _password = text; // Captura el texto ingresado para la contraseña
               },
               validator: (text){
                 if(text?.trim().isEmpty == true){
-                  return "Invalid password";
+                  return "Invalid password"; //Valida si la entrada de la contraseña es correcta
                 }
                 return null;
               },
             ),
-            SizedBox(height: responsive.dp(8)),
+            SizedBox(height: responsive.dp(8)), //Deja espacios en blanco
             SizedBox(
-              width: double.infinity,
+              width: double.infinity, //El boton ocupa todo el ancho disponible
               child: MaterialButton(
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 color: Colors.pinkAccent,
                 onPressed: (){
-                  _submit();
+                  _submit(); //Maneja la accion de enviar el formulario
                 },
                 child: const Text(
                   "Sign up",
@@ -136,7 +136,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 ),
               ),
             ),
-            SizedBox(height: responsive.dp(2)),
+            SizedBox(height: responsive.dp(2)), //Deja espacios en blanco
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -150,12 +150,12 @@ class _RegisterFormState extends State<RegisterForm> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context); //Navega de vuelta a la pagina anterior
                 },
                 ),
               ],
             ),
-            SizedBox(height: responsive.dp(10)),
+            SizedBox(height: responsive.dp(10)), //Deja espacios en blanco
           ],
                 ),
         ),
